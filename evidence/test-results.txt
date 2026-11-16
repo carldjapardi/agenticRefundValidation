@@ -1,0 +1,234 @@
+
+> finchpay-refund-desk@1.0.0 test
+> npm run build && node --test dist/tests/*.test.js
+
+
+> finchpay-refund-desk@1.0.0 build
+> npm run clean --silent && tsc
+
+TAP version 13
+# Subtest: New chat during a pending send rejects the old response and preserves the fresh session
+ok 1 - New chat during a pending send rejects the old response and preserves the fresh session
+  ---
+  duration_ms: 11.745958
+  type: 'test'
+  ...
+# Subtest: client ignores a second submit while pending and renders customer HTML as text
+ok 2 - client ignores a second submit while pending and renders customer HTML as text
+  ---
+  duration_ms: 1.55475
+  type: 'test'
+  ...
+# Subtest: an export keeps its original session filename when New chat finishes first
+ok 3 - an export keeps its original session filename when New chat finishes first
+  ---
+  duration_ms: 1.582
+  type: 'test'
+  ...
+# Subtest: charge aliases normalize before classification and repeated identical references are unambiguous
+ok 4 - charge aliases normalize before classification and repeated identical references are unambiguous
+  ---
+  duration_ms: 2.593
+  type: 'test'
+  ...
+# Subtest: exact supported commands use a visible deterministic route, not provider-error fallback
+ok 5 - exact supported commands use a visible deterministic route, not provider-error fallback
+  ---
+  duration_ms: 0.254625
+  type: 'test'
+  ...
+# Subtest: a repeated refund request or other non-code message does not consume a verification attempt
+ok 6 - a repeated refund request or other non-code message does not consume a verification attempt
+  ---
+  duration_ms: 0.281125
+  type: 'test'
+  ...
+# Subtest: new chat resets verification but cannot reset the single mock charge refund ledger
+ok 7 - new chat resets verification but cannot reset the single mock charge refund ledger
+  ---
+  duration_ms: 0.376791
+  type: 'test'
+  ...
+# Subtest: question/clarification retains conversation and charge context for a follow-up affirmative
+ok 8 - question/clarification retains conversation and charge context for a follow-up affirmative
+  ---
+  duration_ms: 0.151458
+  type: 'test'
+  ...
+# Subtest: low confidence and provider failure keep Triage open for recovery without authorizing a refund
+ok 9 - low confidence and provider failure keep Triage open for recovery without authorizing a refund
+  ---
+  duration_ms: 0.095
+  type: 'test'
+  ...
+# Subtest: Responses produces bounded wording without tools or state authority
+ok 10 - Responses produces bounded wording without tools or state authority
+  ---
+  duration_ms: 8.042875
+  type: 'test'
+  ...
+# Subtest: failed, refused, incomplete, malformed, or obviously misleading Responses use safe fallback wording
+ok 11 - failed, refused, incomplete, malformed, or obviously misleading Responses use safe fallback wording
+  ---
+  duration_ms: 1.686833
+  type: 'test'
+  ...
+# Subtest: Decisions sends one bounded choice request and returns only allowlisted metadata
+ok 12 - Decisions sends one bounded choice request and returns only allowlisted metadata
+  ---
+  duration_ms: 8.643333
+  type: 'test'
+  ...
+# Subtest: question, negation, unclear, and low confidence never hand off or refund
+ok 13 - question, negation, unclear, and low confidence never hand off or refund
+  ---
+  duration_ms: 2.455
+  type: 'test'
+  ...
+# Subtest: live-mode classification still requires code-owned charge validation and identity verification
+ok 14 - live-mode classification still requires code-owned charge validation and identity verification
+  ---
+  duration_ms: 0.671916
+  type: 'test'
+  ...
+# Subtest: refusal, malformed output, HTTP error, invalid JSON, and network error fail closed without fallback
+ok 15 - refusal, malformed output, HTTP error, invalid JSON, and network error fail closed without fallback
+  ---
+  duration_ms: 1.838584
+  type: 'test'
+  ...
+# Subtest: Decisions timeout aborts and returns a safe failure
+ok 16 - Decisions timeout aborts and returns a safe failure
+  ---
+  duration_ms: 11.839958
+  type: 'test'
+  ...
+# Subtest: mode selection is explicit and a configured Decisions failure cannot become offline success
+ok 17 - mode selection is explicit and a configured Decisions failure cannot become offline success
+  ---
+  duration_ms: 0.263292
+  type: 'test'
+  ...
+# Subtest: refund boundary rejects direct unverified calls before recording anything
+ok 18 - refund boundary rejects direct unverified calls before recording anything
+  ---
+  duration_ms: 1.91575
+  type: 'test'
+  ...
+# Subtest: a forged verified flag without a successful tool call is insufficient
+ok 19 - a forged verified flag without a successful tool call is insufficient
+  ---
+  duration_ms: 0.078584
+  type: 'test'
+  ...
+# Subtest: success pauses for input, consumes verification, hands off, refunds once, and ends
+ok 20 - success pauses for input, consumes verification, hands off, refunds once, and ends
+  ---
+  duration_ms: 0.618666
+  type: 'test'
+  ...
+# Subtest: claiming prior verification followed by wrong code fails closed and ends
+ok 21 - claiming prior verification followed by wrong code fails closed and ends
+  ---
+  duration_ms: 0.148709
+  type: 'test'
+  ...
+# Subtest: including the valid code in the initial request cannot skip the Identity wait
+ok 22 - including the valid code in the initial request cannot skip the Identity wait
+  ---
+  duration_ms: 0.210417
+  type: 'test'
+  ...
+# Subtest: verification is tied to the exact session, and fresh sessions reset all authority
+ok 23 - verification is tied to the exact session, and fresh sessions reset all authority
+  ---
+  duration_ms: 0.127875
+  type: 'test'
+  ...
+# Subtest: terminal turns do nothing, and duplicate direct calls reuse the same refund
+ok 24 - terminal turns do nothing, and duplicate direct calls reuse the same refund
+  ---
+  duration_ms: 0.361375
+  type: 'test'
+  ...
+# Subtest: failed verification remains terminal even if the next input is correct
+ok 25 - failed verification remains terminal even if the next input is correct
+  ---
+  duration_ms: 0.111291
+  type: 'test'
+  ...
+# Subtest: the actual dispatcher enforces its step limit on repeated handoffs
+ok 26 - the actual dispatcher enforces its step limit on repeated handoffs
+  ---
+  duration_ms: 0.320084
+  type: 'test'
+  ...
+# Subtest: unknown or ambiguous charge asks for clarification without verification or a refund
+ok 27 - unknown or ambiguous charge asks for clarification without verification or a refund
+  ---
+  duration_ms: 0.388375
+  type: 'test'
+  ...
+# Subtest: refund rejects an unsupported charge even after successful verification
+ok 28 - refund rejects an unsupported charge even after successful verification
+  ---
+  duration_ms: 0.117667
+  type: 'test'
+  ...
+# Subtest: verification state cannot be asserted by an agent without its successful tool result
+ok 29 - verification state cannot be asserted by an agent without its successful tool result
+  ---
+  duration_ms: 0.056875
+  type: 'test'
+  ...
+# Subtest: HTTP session persists between turns; concurrent valid sends record one refund
+ok 30 - HTTP session persists between turns; concurrent valid sends record one refund
+  ---
+  duration_ms: 19.056209
+  type: 'test'
+  ...
+# Subtest: API rejects client-provided authority, malformed JSON, and unknown sessions
+ok 31 - API rejects client-provided authority, malformed JSON, and unknown sessions
+  ---
+  duration_ms: 11.065875
+  type: 'test'
+  ...
+# Subtest: fresh API session is unverified after another session succeeds
+ok 32 - fresh API session is unverified after another session succeeds
+  ---
+  duration_ms: 4.286125
+  type: 'test'
+  ...
+# Subtest: trace endpoint exports recorded inputs, events, state and actual refund records
+ok 33 - trace endpoint exports recorded inputs, events, state and actual refund records
+  ---
+  duration_ms: 2.93575
+  type: 'test'
+  ...
+# Subtest: local static assets serve and cross-origin mutation is rejected
+ok 34 - local static assets serve and cross-origin mutation is rejected
+  ---
+  duration_ms: 3.553209
+  type: 'test'
+  ...
+# Subtest: per-session lock rejects overlapping turns during async classification and is released afterward
+ok 35 - per-session lock rejects overlapping turns during async classification and is released afterward
+  ---
+  duration_ms: 3.2865
+  type: 'test'
+  ...
+# Subtest: two fresh chats cannot concurrently create two refunds for the same mock charge
+ok 36 - two fresh chats cannot concurrently create two refunds for the same mock charge
+  ---
+  duration_ms: 3.971708
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 93.750708

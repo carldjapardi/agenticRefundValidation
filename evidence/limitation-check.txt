@@ -1,0 +1,3 @@
+{"scenario":"same process, new chat","outcome":"issued","reference":"RF-001","newRecords":1}
+{"scenario":"same process, new chat","outcome":"already_refunded","reference":"RF-001","newRecords":0}
+{"scenario":"simulated process restart by constructing a new in-memory store","outcome":"issued","newRecords":1}

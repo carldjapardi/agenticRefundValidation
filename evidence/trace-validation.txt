@@ -1,0 +1,6 @@
+PASS no-refund-requested: exact browser inputs, 9 events, status=ended, outcome=None, 0 new records
+PASS conversation-recovery: exact browser inputs, 34 events, status=ended, outcome=already_refunded, 0 new records
+PASS refund-success: exact browser inputs, 28 events, status=ended, outcome=issued, 1 new records
+PASS verification-failure: exact browser inputs, 21 events, status=ended, outcome=None, 0 new records
+PASS refund-question: exact browser inputs, 21 events, status=waiting, outcome=None, 0 new records
+PASS cross-chat recovery reused the original reference without another record; repeated request never reached verify_identity

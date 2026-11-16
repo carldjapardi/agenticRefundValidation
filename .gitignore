@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# Local working material and generated submission artifacts
+.local/
+/assignment.pdf
+/GOAL_PROMPT.md
+/IMPLEMENTATION_PLAN.md
+/output/
+__pycache__/
+*.py[cod]

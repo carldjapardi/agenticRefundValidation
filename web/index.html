@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="FinchPay's mock refund desk. A three-agent workflow with session verification and an inspectable execution trace."
+    />
+    <title>FinchPay · Refund desk</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="FinchPay home"
+        ><span class="brand-icon" aria-hidden="true">f</span>finchpay<span class="brand-dot"
+          >.</span
+        ></a
+      >
+      <span class="sandbox"
+        ><span class="small-dot"></span> SANDBOX · <span id="triage-mode">CONNECTING</span></span
+      >
+    </header>
+    <main>
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">CUSTOMER SUPPORT / REFUNDS</div>
+          <h1>A clear path to your refund.</h1>
+          <p>A quick identity check. A little peace of mind.</p>
+        </div>
+        <button id="new-chat" class="secondary" type="button">
+          <span aria-hidden="true">＋</span> New chat
+        </button>
+      </div>
+      <div class="workspace">
+        <section class="chat-card" aria-label="Refund conversation">
+          <div class="chat-heading">
+            <div class="desk-avatar" aria-hidden="true">f</div>
+            <div>
+              <h2>Refund desk</h2>
+              <p>Here to help you get it sorted.</p>
+            </div>
+            <span class="session-status" id="session-status">Connecting</span>
+          </div>
+          <ol class="progress" aria-label="Refund progress">
+            <li id="step-triage" class="active"><span>01</span> Request</li>
+            <li id="step-identity"><span>02</span> Verify identity</li>
+            <li id="step-refund"><span>03</span> Refund</li>
+          </ol>
+          <div
+            id="transcript"
+            class="transcript"
+            role="log"
+            aria-live="polite"
+            aria-label="Chat transcript"
+          ></div>
+          <div id="error" class="error" role="alert" hidden></div>
+          <form id="message-form" class="composer">
+            <label for="message" class="sr-only">Message</label
+            ><input
+              id="message"
+              name="message"
+              placeholder="Tell us which charge to refund…"
+              autocomplete="off"
+              maxlength="1000"
+              required
+              disabled
+            /><button id="send" type="submit" disabled>
+              Send <span aria-hidden="true">↗</span>
+            </button>
+          </form>
+          <div class="chat-footer">
+            <span class="small-dot"></span> Mock payments only. No real money moves.
+          </div>
+        </section>
+        <aside class="sidebar">
+          <section class="info-card">
+            <div class="eyebrow">YOUR DEMO CHARGE</div>
+            <div class="charge-title">
+              <span class="charge-icon" aria-hidden="true">↗</span>
+              <div>
+                <h3>FinchPay purchase</h3>
+                <p>CH-101</p>
+              </div>
+            </div>
+            <div class="amount">$25<span>.00</span><span class="currency">USD</span></div>
+            <div class="divider"></div>
+            <p class="helper">Ready to give it a try?</p>
+            <button id="example" class="example" type="button">
+              Please refund CH-101. <span aria-hidden="true">↗</span>
+            </button>
+            <p class="demo-code">Demo verification code <code>2468</code></p>
+          </section>
+          <section class="assurance">
+            <span aria-hidden="true">◇</span>
+            <div>
+              <h3>A check before every refund.</h3>
+              <p>Identity must be verified in this chat before a refund can be issued.</p>
+            </div>
+          </section>
+          <details class="trace-panel" id="trace-panel">
+            <summary>Execution trace <span id="trace-count">0 events</span></summary>
+            <div class="trace-heading">
+              <p>The steps behind this conversation.</p>
+              <p id="trace-session"></p>
+              <button id="export" type="button" class="text-button" disabled>Export JSON ↓</button>
+            </div>
+            <ol id="trace-events" class="trace-events"></ol>
+          </details>
+        </aside>
+      </div>
+      <footer class="page-footer">
+        <span>FINCHPAY REFUND DESK</span
+        ><span>A Stoa build exercise · Three roles, one shared session.</span>
+      </footer>
+    </main>
+  </body>
+</html>

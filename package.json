@@ -1,0 +1,22 @@
+{
+  "name": "finchpay-refund-desk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "clean": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\"",
+    "build": "npm run clean --silent && tsc",
+    "start": "node dist/src/server.js",
+    "dev": "npm run build && npm start",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "check": "tsc --noEmit",
+    "eval:triage": "npm run build --silent && node dist/scripts/evaluate-triage.js"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "typescript": "5.7.3"
+  }
+}
