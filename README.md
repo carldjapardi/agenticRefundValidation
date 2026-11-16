@@ -2,15 +2,24 @@
 
 Agentic driven validation of user requested refunds. **Triage → Identity → Refund**. Triage combines an exact command parser, OpenAI Decisions classification, and Responses-generated conversation. Server code does verification and refund authority. All customer and payment data is mocked in memory.
 
+## Engineering Decision 
+See the engineering note md for more detail.
+
+In essence, the Triage agent uses a hybrid of OpenAI Decisions and deterministic code. I decided to go with this hybrid plan because it can understand user intent better than a regex parser, and provides a flexible response to user questions. 
+
+OpenAI Decisions returns a structured JSON classification (refund_request, refund_question, no_refund_requested, or unclear) with a confidence score for the selected intent.
+
+Code validates the result and charge, then determines whether to ask for clarification, explain the process, hand off to Identity, or end the conversation. Low-confidence classifications trigger clarification. Exact supported refund commands are handled directly by code.
+
+The OpenAI Responses API generates Triage explanations and clarification questions, with predetermined fallback messages if generation fails.
+
+Identity prompts and refund confirmations remain deterministic. Verification and refund authorization are enforced in code; model output cannot authorize a refund.
+
 ## Run locally
-
-Requires Node.js 22+ and npm:
-
 ```sh
 npm ci
 npm run dev
 ```
-
 Open [localhost:3000](http://localhost:3000). 
 
 For live Triage, create OPENAPI=key in `.env`.
@@ -54,21 +63,6 @@ Charge aliases normalize to CH-101. Only the bare supported command `refund CH-1
 Identity accepts only four-digit candidates. Other input re-prompts without consuming an attempt; one wrong four-digit code ends the session. Only a successful verification tool result permits the verified state. The refund tool additionally checks private proof tied to that exact session before any ledger lookup or write. A synchronous check/write prevents duplicate records across concurrent chats in this process.
 
 Both API adapters use eight-second timeouts without retries. Responses requests no tools and `store=false`; malformed, refused, or incomplete wording uses fallback text. A trusted no-refund status is appended. Schema and display checks do not prove factual accuracy. Recent Triage messages may go to OpenAI; Identity replies stay local. Use fictional data.
-
-## Verify and review
-
-```sh
-npm run check
-npm test
-```
-
-Both run offline. There are **36 tests** covering domain authority, HTTP concurrency, adapters, conversational recovery, and browser state races. HTTP tests require temporary loopback ports.
-
-`npm run eval:triage --silent` is optional and uses paid API requests. The saved live evaluation passed **14/14** scenarios; it is a prior behavioral snapshot, not a new API run during cleanup or a production accuracy claim.
-
-The five current browser traces are documented in [traces/README.md](traces/README.md). See [FLOWCHART.md](FLOWCHART.md) for the control flow, [AUDIT.md](AUDIT.md) for requirements and evidence, and [ENGINEERING_NOTE.md](ENGINEERING_NOTE.md) for the candidate-review draft and AI disclosure.
-
-The local packaging script uses an explicit file allowlist, checks the configured credential against selected files and decompressed ZIP contents, and verifies archive bytes against the workspace. Run it with `OPENAI` loaded in the environment. Generated packages live in `output/`; local history, the supplied assignment, and planning notes are excluded.
 
 ## Limits
 
