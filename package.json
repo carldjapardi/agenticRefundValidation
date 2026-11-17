@@ -13,7 +13,8 @@
     "dev": "npm run build && npm start",
     "test": "npm run build && node --test dist/tests/*.test.js",
     "check": "tsc --noEmit",
-    "eval:triage": "npm run build --silent && node dist/scripts/evaluate-triage.js"
+    "eval:triage": "npm run build --silent && node dist/scripts/evaluate-triage.js",
+    "build:vercel": "npm run build && node scripts/build-vercel.mjs"
   },
   "devDependencies": {
     "@types/node": "22.10.2",

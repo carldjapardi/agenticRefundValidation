@@ -1,0 +1,7 @@
+2026-11-17 — connected Supabase project pltgvinscoavmcaakdiw
+Migration: 20261117224813_finchpay_hosted; existing Atlas tables preserved.
+Executed tests/hosted-database.sql as service_role inside a rolled-back transaction.
+PASS: service-only access, session ownership, verification authority, null/expired/stale leases, duplicate prevention, visitor isolation, and failed-code crash recovery.
+Test rows rolled back; refund identity sequences may advance.
+Security advisor: no warning/error findings. RLS-without-policy informational findings are intentional for these backend-only tables.
+Vercel HTTP/browser deployment not exercised by these database checks.

@@ -1,6 +1,14 @@
 # FinchPay requirement and evidence audit
 
-Current source and retained evidence are mapped below. Cross-chat refund deduplication and conversational recovery are extensions added after review; they are separate from the assignment's core role, verification, session, and UI requirements. The engineering note remains a candidate-review draft.
+The original local implementation and retained evidence are mapped below. Hosting is an additional adapter documented in the next section. Cross-chat refund deduplication and conversational recovery are extensions added after review; they are separate from the assignment's core role, verification, session, and UI requirements. The engineering note remains a candidate-review draft.
+
+## Hosting extension (2026-11-17)
+
+The Vercel adapter keeps the assignment's local server and mock store intact. `api/index.ts` and `src/hosted.ts` use `src/supabase.ts` and the prefixed migration. The same bounded loop now awaits either synchronous local tools or asynchronous persistent tools. New visitor workspaces use an opaque secure cookie; ownership is checked for every session operation.
+
+The database enforces durable verification, failed-code state, expiring turn leases, stale-request rejection, and a unique workspace/charge refund record. Functions are service-role-only; tables deny browser roles. Checkpointed conversation state and ledger mutations are separate: retries deduplicate a committed refund, while a crash can leave an incomplete trace. No provider payment is executed.
+
+The migration was applied to the existing connected project without changing Atlas tables. All 45 automated tests pass (the original 36 plus nine hosted cases). `tests/hosted-database.sql` passed against the real database, including null/expired/stale leases and failed-code crash recovery; test rows were rolled back. Evidence is in `evidence/hosted-test-results.txt` and `evidence/hosted-database-results.txt`. See [DEPLOYMENT.md](DEPLOYMENT.md) for settings and the remaining hosted limitations. A live Vercel/browser deployment has not been verified by these tests.
 
 ## Assignment requirements
 

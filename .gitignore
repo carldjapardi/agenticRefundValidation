@@ -14,3 +14,9 @@ dist/
 /output/
 __pycache__/
 *.py[cod]
+
+# Hosted build output and local platform state
+/public/
+.vercel/
+supabase/.temp/
+supabase/.branches/

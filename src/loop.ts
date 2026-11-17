@@ -1,6 +1,6 @@
 import { agents, type Agent } from './agents.js';
 import { record, reply, type Role, type Session } from './session.js';
-import { MockTools, type ToolResult } from './tools.js';
+import type { AgentTools, ToolResult } from './tools.js';
 
 export const MAX_STEPS = 12;
 
@@ -8,7 +8,7 @@ export const MAX_STEPS = 12;
 export async function runTurn(
   session: Session,
   input: string,
-  tools: MockTools,
+  tools: AgentTools,
   roles: Record<Role, Agent> = agents,
 ): Promise<void> {
   if (session.status === 'ended') return; // No new messages, tools, or effects after completion.
@@ -46,8 +46,8 @@ export async function runTurn(
           });
           result =
             action.tool === 'verify_identity'
-              ? tools.verify_identity(session, action.code)
-              : tools.issue_refund(session, action.charge);
+              ? await tools.verify_identity(session, action.code)
+              : await tools.issue_refund(session, action.charge);
           record(session, 'tool_result', { ...result });
           break;
         }

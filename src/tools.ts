@@ -10,6 +10,11 @@ export type ToolResult =
       amount: number;
       created: boolean;
     };
+export interface AgentTools {
+  verify_identity(session: Session, code: string): ToolResult | Promise<ToolResult>;
+  issue_refund(session: Session, charge: string): ToolResult | Promise<ToolResult>;
+}
+
 export interface RefundRecord {
   sessionId: string;
   reference: string;
@@ -18,7 +23,7 @@ export interface RefundRecord {
 }
 
 /** One mock tool store per process. There are no network calls or durable writes. */
-export class MockTools {
+export class MockTools implements AgentTools {
   private readonly verifiedSessions = new WeakSet<Session>();
   private readonly refunds = new Map<string, RefundRecord>();
 

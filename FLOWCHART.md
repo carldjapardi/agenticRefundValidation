@@ -1,6 +1,6 @@
 # FinchPay control-flow map
 
-Current implementation, including conversation recovery and charge-level deduplication. Model outputs propose intent or wording; code owns state and action authority.
+Local assignment flow, including conversation recovery and charge-level deduplication. The hosted storage variant is described in section 6. Model outputs propose intent or wording; code owns state and action authority.
 
 Scope distinction: the assignment requires verification in the current session before a refund, plus a fresh unverified session on New chat. Cross-chat refund deduplication is an additional business rule implemented after review; it is not an explicit assignment objective.
 
@@ -132,3 +132,10 @@ flowchart TD
 New chat resets session-scoped verification, never charge-level payment history. It does not cancel already-received server work, revoke old session handles, or undo a completed refund. Client generation checks prevent an old message reply from repopulating the fresh conversation. Export errors are not generation-checked; download delivery/cancellation is not observed by the app. These remain documented UI limits.
 
 Source: src/charges.ts, agents.ts, decisions.ts, triage-replies.ts, loop.ts, tools.ts, session.ts, server.ts, and web/app.ts.
+
+
+## 6. Hosted storage variant
+
+The role decisions in the diagrams stay the same on Vercel. Before a session operation, `src/hosted.ts` hashes the secure visitor cookie and checks ownership. Message requests claim an expiring Supabase turn lease; overlapping requests receive 409. The loop awaits persistent tools: verification records server-owned proof, and the refund RPC checks that proof, the active lease, and the selected charge before an atomic insert-or-return. A database uniqueness constraint applies per visitor workspace and charge. A new visitor can demonstrate a fresh refund; New chat retains the current visitor's history.
+
+The final session snapshot saves and releases the lease; errors attempt release, and crashed requests expire. Stale lease holders cannot write or release a replacement claim. A committed refund survives a failed snapshot save, and subsequent verified requests return its existing reference. Wrong-code failure also survives that crash window. Stored traces may be incomplete after a crash. The original synchronous store and process-restart limitation apply only to the local adapter. See DEPLOYMENT.md for configuration and scope.
