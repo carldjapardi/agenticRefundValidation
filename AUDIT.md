@@ -8,7 +8,7 @@ The Vercel adapter keeps the assignment's local server and mock store intact. `a
 
 The database enforces durable verification, failed-code state, expiring turn leases, stale-request rejection, and a unique workspace/charge refund record. Functions are service-role-only; tables deny browser roles. Checkpointed conversation state and ledger mutations are separate: retries deduplicate a committed refund, while a crash can leave an incomplete trace. No provider payment is executed.
 
-The migration was applied to the existing connected project without changing Atlas tables. All 45 automated tests pass (the original 36 plus nine hosted cases). `tests/hosted-database.sql` passed against the real database, including null/expired/stale leases and failed-code crash recovery; test rows were rolled back. Evidence is in `evidence/hosted-test-results.txt` and `evidence/hosted-database-results.txt`. See [DEPLOYMENT.md](DEPLOYMENT.md) for settings and the remaining hosted limitations. A live Vercel/browser deployment has not been verified by these tests.
+The migration was applied to the existing connected project without changing Atlas tables. All 48 automated tests pass (the original 36, eleven hosted cases, and client startup recovery). `tests/hosted-database.sql` passed against the real database, including null/expired/stale leases and failed-code crash recovery; test rows were rolled back. Evidence is in `evidence/hosted-test-results.txt` and `evidence/hosted-database-results.txt`. See [DEPLOYMENT.md](DEPLOYMENT.md) for settings and the remaining hosted limitations. A live Vercel/browser deployment has not been verified by these tests.
 
 ## Assignment requirements
 

@@ -324,3 +324,68 @@ test('hosted configuration requires persistence and trusted HTTPS origins instea
   );
   assert.throws(() => createRpc('http://example.com', 'fake'), /HTTPS/);
 });
+
+test('Vercel configuration errors identify setting names without disclosing supplied values', async () => {
+  const { createApi } = await import('../api/index.js');
+  const base = {
+    APP_ORIGIN: 'https://finchpay.example',
+    SUPABASE_URL: 'https://example.supabase.co',
+    SUPABASE_SECRET_KEY: 'sb_secret_private-sentinel',
+    TRIAGE_MODE: 'deterministic',
+  };
+  for (const [env, setting] of [
+    [{}, 'APP_ORIGIN'],
+    [{ ...base, APP_ORIGIN: 'private-sentinel' }, 'APP_ORIGIN'],
+    [{ ...base, SUPABASE_URL: 'private-sentinel' }, 'SUPABASE_URL'],
+    [{ ...base, TRIAGE_MODE: 'private-sentinel' }, 'TRIAGE_MODE'],
+    [{ ...base, TRIAGE_MODE: 'decisions' }, 'OPENAI'],
+  ] as [NodeJS.ProcessEnv, string][]) {
+    const response = await createApi(env).fetch(
+      new Request('https://finchpay.example/api/sessions', { method: 'POST', body: '{}' }),
+    );
+    assert.equal(response.status, 503);
+    const text = await response.text();
+    assert.match(text, new RegExp(setting));
+    assert.doesNotMatch(text, /private-sentinel/);
+  }
+});
+
+test('only the exact configured Vercel production, branch, and deployment origins are accepted', async (t) => {
+  const savedFetch = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = savedFetch;
+  });
+  globalThis.fetch = async () => Response.json(createSession());
+  const handler = hostedFromEnvironment({
+    APP_ORIGIN: ' https://finchpay.example ',
+    SUPABASE_URL: 'https://example.supabase.co',
+    SUPABASE_SECRET_KEY: 'sb_secret_fake',
+    TRIAGE_MODE: 'deterministic',
+    VERCEL_URL: 'finchpay-unique.vercel.app',
+    VERCEL_BRANCH_URL: 'finchpay-git-main.vercel.app',
+    VERCEL_PROJECT_PRODUCTION_URL: 'finchpay.vercel.app',
+  });
+  for (const origin of [
+    'https://finchpay.example',
+    'https://finchpay-unique.vercel.app',
+    'https://finchpay-git-main.vercel.app',
+    'https://finchpay.vercel.app',
+  ]) {
+    const response = await handler(
+      new Request(`${origin}/api/sessions`, {
+        method: 'POST',
+        body: '{}',
+        headers: { Origin: origin },
+      }),
+    );
+    assert.equal(response.status, 201);
+  }
+  const rejected = await handler(
+    new Request('https://finchpay.example/api/sessions', {
+      method: 'POST',
+      body: '{}',
+      headers: { Origin: 'https://another-project.vercel.app' },
+    }),
+  );
+  assert.equal(rejected.status, 403);
+});

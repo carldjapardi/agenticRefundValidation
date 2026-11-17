@@ -80,12 +80,16 @@ function render(): void {
   send.textContent = busy ? 'Sending…' : 'Send ↗';
   exportButton.disabled = !session;
   element('triage-mode').textContent = !session
-    ? 'CONNECTING'
+    ? busy
+      ? 'CONNECTING'
+      : 'UNAVAILABLE'
     : session.triageMode === 'decisions'
       ? 'HYBRID TRIAGE'
       : 'DETERMINISTIC TRIAGE';
   element('session-status').textContent = !session
-    ? 'Connecting'
+    ? busy
+      ? 'Connecting'
+      : 'Connection failed'
     : ended
       ? session.refundOutcome === 'already_refunded'
         ? 'Already refunded'

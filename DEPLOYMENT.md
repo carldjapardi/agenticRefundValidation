@@ -32,7 +32,7 @@ Add these variables to the Vercel environments being deployed:
 | `SUPABASE_SECRET_KEY` | The project's server secret key; legacy service-role keys also work |
 | `APP_ORIGIN` | Exact HTTPS origin, such as `https://your-project.vercel.app`, without a path |
 
-Secrets stay in Vercel's environment settings and never enter browser code. Modern Supabase secret keys use the `apikey` header; legacy JWT keys additionally use `Authorization: Bearer`. The API also accepts the exact `VERCEL_URL` deployment origin for previews. Cross-site browser requests are rejected. Preview and production should use separate Supabase projects or database branches when testing migrations against real data; this project is currently a disposable demo.
+Secrets stay in Vercel's environment settings and never enter browser code. Modern Supabase secret keys use the `apikey` header; legacy JWT keys additionally use `Authorization: Bearer`. The API also accepts this project's exact `VERCEL_URL`, `VERCEL_BRANCH_URL`, and `VERCEL_PROJECT_PRODUCTION_URL` origins. It does not allow arbitrary vercel.app domains. Cross-site browser requests are rejected. Preview and production should use separate Supabase projects or database branches when testing migrations against real data; this project is currently a disposable demo.
 
 Push the commit to the connected GitHub branch to trigger Vercel, or redeploy that commit from Vercel. Environment changes take effect on a new deployment. This implementation commit does not itself push or publish a deployment.
 
@@ -54,7 +54,7 @@ npm test
 npm run build:vercel
 ```
 
-The 45 automated tests include nine hosted tests using a shared remote-store substitute. They exercise fresh function instances, cookie/workspace isolation, duplicate prevention, malformed input, request overlap, adapter errors, and forged verification. Existing local tests remain offline. A fresh dependency installation also passed checks, tests, and the Vercel build; its output is in `evidence/hosted-clean-install-results.txt`.
+The 48 automated tests include eleven hosted tests using a shared remote-store substitute. They exercise fresh function instances, cookie/workspace isolation, duplicate prevention, malformed input, request overlap, adapter errors, and forged verification, startup diagnostics, and exact Vercel alias handling. A client regression checks that failed startup leaves Connecting and New chat can recover. Existing local tests remain offline. A fresh dependency installation also passed checks, tests, and the Vercel build; its output is in `evidence/hosted-clean-install-results.txt`.
 
 `tests/hosted-database.sql` separately checks the actual migrated database as `service_role`: denied public access, ownership, verification, leases, duplicates, and failed-code crash recovery. Test rows are rolled back; identity sequences can advance. See `evidence/hosted-database-results.txt` for the recorded result. These database checks passed on the connected project. They do not establish a live Vercel deployment test or production load coverage.
 
@@ -63,3 +63,7 @@ After deployment, verify the normal success, failed-code, question/yes, repeated
 Hosted data currently has no automatic retention cleanup, user accounts, account-level throttling, or real verification. The local in-memory restart limitation still applies only to `npm run dev`; the hosted ledger survives restarts and redeployments.
 
 References: [Vercel Node functions](https://vercel.com/docs/functions/runtimes/node-js), [Vercel configuration](https://vercel.com/docs/project-configuration/vercel-json), [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys), [database functions](https://supabase.com/docs/guides/database/functions).
+
+## Startup configuration troubleshooting
+
+A page showing “Hosted mode requires APP_ORIGIN” has not reached Supabase yet. Set the named variable for the deployment's environment and redeploy; existing deployments retain their prior environment snapshot. Missing settings and invalid URL/mode values are reported by name without disclosing values. Required variables are APP_ORIGIN, SUPABASE_URL, SUPABASE_SECRET_KEY, and OPENAI when TRIAGE_MODE is decisions. Check Production/Preview targets and branch overrides separately. The app now displays Connection failed after startup errors instead of remaining on Connecting.

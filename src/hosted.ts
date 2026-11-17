@@ -6,6 +6,26 @@ import { createSession } from './session.js';
 import { createRpc, StorageError, SupabaseStore } from './supabase.js';
 import { createTriageResponder, type TriageResponder } from './triage-replies.js';
 
+export class HostedConfigurationError extends Error {}
+
+function httpsOrigin(value: string, name: string): string {
+  try {
+    const url = new URL(value);
+    if (
+      url.protocol === 'https:' &&
+      url.pathname === '/' &&
+      !url.search &&
+      !url.hash &&
+      !url.username &&
+      !url.password
+    )
+      return url.origin;
+  } catch {
+    /* Report only the setting name, never the supplied value. */
+  }
+  throw new HostedConfigurationError(`${name} must be an HTTPS origin without a path.`);
+}
+
 const COOKIE = '__Host-finchpay-demo';
 
 class HttpError extends Error {
@@ -66,15 +86,7 @@ export function createHostedHandler(options: {
 }): (request: Request) => Promise<Response> {
   const roles = createAgents(options.classifier, options.responder);
   const origins = new Set(
-    options.origins.map((origin) => {
-      const url = new URL(origin);
-      if (url.protocol !== 'https:' || url.pathname !== '/' || url.search || url.hash) {
-        throw new Error(
-          'APP_ORIGIN must be an HTTPS origin, for example https://finchpay.vercel.app.',
-        );
-      }
-      return url.origin;
-    }),
+    options.origins.map((origin) => httpsOrigin(origin, 'APP_ORIGIN or Vercel deployment origin')),
   );
   return async (request) => {
     const headers = new Headers({
@@ -169,15 +181,48 @@ export function createHostedHandler(options: {
 export function hostedFromEnvironment(
   env: NodeJS.ProcessEnv,
 ): (request: Request) => Promise<Response> {
-  if (!env.APP_ORIGIN || !env.SUPABASE_URL || !env.SUPABASE_SECRET_KEY) {
-    throw new Error('Hosted mode requires APP_ORIGIN, SUPABASE_URL, and SUPABASE_SECRET_KEY.');
+  const settings = { ...env };
+  for (const key of [
+    'APP_ORIGIN',
+    'SUPABASE_URL',
+    'SUPABASE_SECRET_KEY',
+    'OPENAI',
+    'TRIAGE_MODE',
+  ]) {
+    if (settings[key] !== undefined) settings[key] = settings[key]?.trim();
   }
-  const classifier = classifierFromEnvironment(env);
+  const missing = ['APP_ORIGIN', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY'].filter(
+    (key) => !settings[key],
+  );
+  if (
+    (settings.TRIAGE_MODE ?? (settings.OPENAI ? 'decisions' : 'deterministic')) === 'decisions' &&
+    !settings.OPENAI
+  )
+    missing.push('OPENAI');
+  if (missing.length) {
+    throw new HostedConfigurationError(
+      `Hosted mode requires ${missing.join(', ')}. Set these variables for this Vercel environment and redeploy.`,
+    );
+  }
+  if (settings.TRIAGE_MODE && !['decisions', 'deterministic'].includes(settings.TRIAGE_MODE)) {
+    throw new HostedConfigurationError('TRIAGE_MODE must be decisions or deterministic.');
+  }
+  const appOrigin = httpsOrigin(settings.APP_ORIGIN!, 'APP_ORIGIN');
+  const supabaseUrl = httpsOrigin(settings.SUPABASE_URL!, 'SUPABASE_URL');
+  const classifier = classifierFromEnvironment(settings);
+  // Exact platform-provided aliases only; never trust an arbitrary *.vercel.app origin.
+  const vercelOrigins = [
+    settings.VERCEL_URL,
+    settings.VERCEL_BRANCH_URL,
+    settings.VERCEL_PROJECT_PRODUCTION_URL,
+  ]
+    .filter((host): host is string => Boolean(host))
+    .map((host) => `https://${host}`);
   return createHostedHandler({
-    store: new SupabaseStore(createRpc(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY)),
-    origins: [env.APP_ORIGIN, ...(env.VERCEL_URL ? [`https://${env.VERCEL_URL}`] : [])],
+    store: new SupabaseStore(createRpc(supabaseUrl, settings.SUPABASE_SECRET_KEY!)),
+    origins: [appOrigin, ...vercelOrigins],
     classifier,
     responder:
-      classifier.mode === 'decisions' ? createTriageResponder(env.OPENAI ?? '') : undefined,
+      classifier.mode === 'decisions' ? createTriageResponder(settings.OPENAI ?? '') : undefined,
   });
 }

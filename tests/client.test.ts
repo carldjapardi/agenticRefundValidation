@@ -34,7 +34,7 @@ class Element {
   }
 }
 
-async function client(t: TestContext) {
+async function client(t: TestContext, startupError?: string) {
   const elements = new Map<string, Element>();
   const created: Element[] = [];
   const requests: { path: string; resolve: (response: Response) => void }[] = [];
@@ -64,13 +64,13 @@ async function client(t: TestContext) {
   // Cache-bust each test so the real module registers its listeners afresh.
   await import(`../web/app.js?test=${Math.random()}`);
   const get = (id: string) => elements.get(id)!;
-  const respond = async (index: number, value: unknown) => {
+  const respond = async (index: number, value: unknown, status = 200) => {
     assert.ok(requests[index]);
-    requests[index].resolve(new Response(JSON.stringify(value), { status: 200 }));
+    requests[index].resolve(new Response(JSON.stringify(value), { status }));
     await setImmediate();
   };
   const first = createSession();
-  await respond(0, first);
+  await respond(0, startupError ? { error: startupError } : first, startupError ? 503 : 200);
   const submit = (message: string) => {
     get('message').value = message;
     return get('message-form').handlers.get('submit')!({ preventDefault() {} });
@@ -131,4 +131,19 @@ test('an export keeps its original session filename when New chat finishes first
   await c.respond(1, { session: c.first });
   await pending;
   assert.ok(c.created.some((e) => e.download === `finchpay-${c.first.id}.json`));
+});
+
+test('startup failure leaves Connecting and New chat retries without stale error state', async (t) => {
+  const c = await client(t, 'Hosted mode requires APP_ORIGIN.');
+  assert.equal(c.get('session-status').textContent, 'Connection failed');
+  assert.equal(c.get('triage-mode').textContent, 'UNAVAILABLE');
+  assert.equal(c.get('message').disabled, true);
+  assert.match(c.get('error').textContent, /APP_ORIGIN/);
+  c.get('new-chat').click();
+  assert.equal(c.get('session-status').textContent, 'Connecting');
+  const fresh = createSession();
+  await c.respond(1, fresh);
+  assert.equal(c.get('session-status').textContent, 'Unverified');
+  assert.equal(c.get('message').disabled, false);
+  assert.equal(c.get('error').hidden, true);
 });
