@@ -34,12 +34,7 @@ For live Triage, set `OPENAI=your-key` in a private `.env` file. Node.js 22+ is 
 The page displays the active mode. Provider errors keep the conversation open for retry; they do not silently switch modes.
 
 ## Host on Vercel + Supabase
-
-The hosted adapter uses the same roles and UI, with durable session/verification/refund storage and database-backed turn locks. Each visitor has a separate mock payment history; New chat retains that visitor's history and requires fresh verification.
-
-`vercel.json` configures `npm run build:vercel`, static output in `public`, and a shared API function. Set `OPENAI`, `TRIAGE_MODE=decisions`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, and `APP_ORIGIN` in Vercel. The migration has been applied to the connected Supabase project. See [DEPLOYMENT.md](DEPLOYMENT.md) for setup, concurrency, security boundaries, and remaining demo limits.
-
-Run `npm run check`, `npm test` (45 tests), and `npm run build:vercel` before deployment. The five saved browser traces are local evidence; the hosted database has separate regression checks.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for setup
 
 ## Try the conversations
 
